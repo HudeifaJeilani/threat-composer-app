@@ -302,6 +302,10 @@ resource "aws_ecs_service" "app_service" {
     container_port   = 80
   }
 
+  lifecycle {
+    ignore_changes = [task_definition]
+  }
+
   depends_on = [aws_lb_listener.app_listener]
 }
 
