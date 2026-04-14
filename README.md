@@ -1,4 +1,4 @@
-Cloud-Native DevOps Pipeline - Threat Composer App.
+CloudSec Pipeline
 
 Overview
 
@@ -18,6 +18,7 @@ Troubleshooting and troubleshooting actual deployment.
 Reproducible, version-controlled deployments, and rollback.
 
 Repository Structure
+
 ecs-assignment/
 │
 ├── .github/
