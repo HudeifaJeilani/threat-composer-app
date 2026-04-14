@@ -1,49 +1,211 @@
-<div align="center">
-    <img src="./images/coderco.jpg" alt="CoderCo" width="300"/>
-</div>
+Cloud-Native DevOps Pipeline - Threat Composer App.
 
-# CoderCo Assignment 1 - Open Source App Hosted on ECS with Terraform 🚀
+Overview
 
-This project is based on Amazon's Threat Composer Tool, an open source tool designed to facilitate threat modeling and improve security assessments. You can explore the tool's dashboard here: [Threat Composer Tool](https://awslabs.github.io/threat-composer/workspaces/default/dashboard)
+This project demonstrates a completely end-to-end cloud-native DevOps pipeline, using Infrastructure as Code to deploy a containerized React application to AWS, with CI/CD automation.
+The system provisioning of AWS infrastructure with Terraform, application development with Docker, and image storage in Amazon ECR, and deployment of both to ECS Fargate behind an Application Load Balancer. GitHub Actions are used to deploy fully automated.
 
-## Task/Assignment 📝
+![alt text](<AWS cloud architecture with GitHub Actions.png>)
 
-- Create your own repository and complete the task there. You may create a `app` in your repo and copy all the files in this directory into it. Or alternatively, you can use this directory as is. Your choice.
+What this Project Shows.
 
-- Your task will be to create a container image for the app, push it to ECR (recommended) or DockerHub. Ideally, you should use a CI/CD pipeline to build, test, and push the container image.
+Design and implementation of end-to-end DevOps pipeline.
+Provisioning of infrastructure with Terraform (IaC).
+Ready-to-use production Docker and containerization.
+AWS ECS Fargate with load balancing.
+CI/CD automation with GitHub Actions.
+Troubleshooting and troubleshooting actual deployment.
+Reproducible, version-controlled deployments, and rollback.
 
-- Deploy the app on ECS using Terraform. All the resources should be provisioned using Terraform. Use TF modules.
+Repository Structure
+ecs-assignment/
+│
+├── .github/
+│   └── workflows/
+│       └── deploy.yml        # CI/CD pipeline (build + deploy to ECS)
+│
+├── terraform/
+│   └── envs/
+│       └── dev/
+│           ├── main.tf       # Core infrastructure (VPC, ECS, ALB, etc.)
+│           ├── terraform.tfvars
+│           └── provider.tf   # AWS provider config
+│
+├── src/                      # React application source code
+│
+├── public/                   # Static assets
+│
+├── Dockerfile               # Multi-stage build (React → Nginx)
+├── nginx.conf               # SPA routing + production config
+│
+├── package.json
+├── package-lock.json
+├── tsconfig.json
+│
+├── .dockerignore
+├── .gitignore
+│
+└── README.md
 
-- Make sure the app is live on `https://tm.<your-domain>` or `https://tm.labs.<your-domain>`
+CI/CD Pipeline Flow
+Developer → GitHub → GitHub Actions
+                    ↓
+              Build Docker Image
+                    ↓
+              Tag (commit SHA)
+                    ↓
+              Push to Amazon ECR
+                    ↓
+        Update ECS Task Definition
+                    ↓
+              Deploy to ECS Service
 
-- App must use HTTPS. Hosted on ECS. Figure out the rest. Once app is live, add screenshots to the README.md file.
+Tech Stack
 
-- Add architecture diagram of how the infrastructure is setup. (Use Lucidchart or draw.io or mermaid) You are free to use any diagramming tool.
+Frontend
 
-## Local app setup 💻
+    React (TypeScript)
+    DevOps & Cloud
+    AWS ECS (Fargate)
+    Amazon ECR
+    Application Load Balancer (ALB)
+    AWS VPC, Subnets, Security Groups.
+    AWS IAM
+    CloudWatch Logs
 
-```bash
-yarn install
-yarn build
-yarn global add serve
-serve -s build
+Infrastructure as Code
 
-#yarn start
-http://localhost:3000/workspaces/default/dashboard
+    Terraform
 
-## or
-yarn global add serve
-serve -s build
-```
+CI/CD
 
-## Useful links 🔗
+    GitHub Actions
 
-- [Terraform AWS Registry](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
-- [Terraform AWS ECS](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_cluster)
-- [Terraform Docs](https://www.terraform.io/docs/index.html)
-- [ECS Docs](https://docs.aws.amazon.com/ecs/latest/userguide/what-is-ecs.html)
+Containerization
+    - Docker
+    - Nginx
 
-## Advice & Tips �
 
-- This is just a simple app, you may use another app if you'd like. 
-- Use best practices for your Terraform code. Use best practices for your container image. Use best practices for your CI/CD pipeline.
+⚙️ Infrastructure (Terraform)
+Terraform is used to define infrastructure completely, making it consistent and reproducible.
+
+Key Resources:
+
+    - VPC (custom CIDR block)
+    - Public subnets in more than one AZ.
+    - Internet Gateway
+    - Route tables
+    - Security groups
+    - Application Load Balancer (facing internet)
+    - Target group & listener
+    - ECS cluster
+    - ECS task definition & service
+    - IAM roles (execution role)
+    - CloudWatch log group
+
+Location:
+terraform/envs/dev/main.tf
+
+Containerization Strategy
+
+Docker is used to productionise the React application:
+
+    - Multi-stage build (build- serve)
+    - Static files generated using React build
+    - Served via Nginx
+    - SPA routing (resolves refresh problems) configured.
+    - ECS compatible on port 80.
+
+CI/CD Pipeline (GitHub Actions)
+
+Completely automated deployment pipeline on each push to main.
+
+Pipeline Breakdown:
+
+    1. Code Push
+    2. Build Docker Image
+    3. Tag Image with Commit SHA.
+    4. Push Image to Amazon ECR.
+    5. Retrieve Current ECS Task Definition.
+    6. Infuse New Image Version.
+    7. Register New Task Definition Revision
+    8. Implement Updated Service to ECS.
+
+Key DevOps Features
+
+    * Completely automated CI/CD pipeline.
+    Image tag commit deployments with image tag commit deployments.
+    * Versions def task definition.
+    * Safe and instant rollback.
+    * Terraform (Infrastructure as Code)
+    * Load-balanced production deployment
+    Centralised cloudwatch logging.
+
+
+Deployment & Rollback Strategy
+
+Every deployment results in a new revision of an ECS task definition:
+
+Example:
+    - app-task:7
+    - app-task:8
+    - app-task:9
+
+Rollback Process:
+
+    2. Go to ECS Service.
+    2. Click Update
+    3. Choose past task definition.
+    4. Deploy
+
+This allows quick and secure recovery of failed deployments.
+
+Challenges & Solutions
+
+React SPA Routing Problem.
+
+Issue: Refresh resulted in 404 errors.
+Mean: Set up Nginx to direct all requests to index.html.
+
+Version Confusion with Docker Image.
+
+problem: With latest, inconsistent deployments were made.
+Solution: Installed image tagging with commit.
+
+ECS Deployment Failure to update.
+
+Problem: No new pictures were used.
+Solution: New CI/CD pipe to dynamically specify tasks.
+
+CI/CD Failures
+
+Problem: Early pipeline failures because of config/auth problems.
+Solution: Checked workflow and resolved logs.
+
+▶️ Local Development
+# Build image
+docker build -t threat-composer-app.
+
+# Run container
+docker run -p 3000:80 threat-composer-app.
+Access:
+http://localhost:3000
+
+Future Improvements:
+
+HTTPS with AWS ACM
+Infrastructure ℊ CloudWatch alarms and monitoring.
+Multi-environment (dev / prod) setup.
+Remote Terraform state (S3 + DynamoDB)
+CI/CD testing and security checks.
+Migrate ECS activities to private subnets.
+
+Key Takeaways
+
+This project demonstrates:
+
+    - Planning and implementing scalable cloud infrastructure.
+    - Adopting CI/CD pipelines by putting them into practice.
+    - Troubleshooting production-like issues
+    - Adopting the DevOps principle on an end-to-end basis.
+    - Design of reproducible and automated system.
