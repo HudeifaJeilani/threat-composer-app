@@ -23,21 +23,21 @@ ecs-assignment/
 │
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml        # CI/CD pipeline (build + deploy to ECS)
+│       └── deploy.yml        
 │
 ├── terraform/
 │   └── envs/
 │       └── dev/
-│           ├── main.tf       # Core infrastructure (VPC, ECS, ALB, etc.)
+│           ├── main.tf       
 │           ├── terraform.tfvars
-│           └── provider.tf   # AWS provider config
+│           └── provider.tf   
 │
-├── src/                      # React application source code
+├── src/                      
 │
-├── public/                   # Static assets
+├── public/                   
 │
-├── Dockerfile               # Multi-stage build (React → Nginx)
-├── nginx.conf               # SPA routing + production config
+├── Dockerfile               
+├── nginx.conf              
 │
 ├── package.json
 ├── package-lock.json
